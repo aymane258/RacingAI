@@ -6,7 +6,7 @@ public class Environment : MonoBehaviour
 {
     private TextMeshPro scoreBoard;
 
-    private Character character;
+    private Car car;
 
     public void OnEnable()
     {
@@ -16,6 +16,6 @@ public class Environment : MonoBehaviour
 
     private void FixedUpdate()
     {
-        scoreBoard.text = character.GetCumulativeReward().ToString("f2");
+        scoreBoard.text = car.GetCumulativeReward().ToString("f2");
     }
 }
