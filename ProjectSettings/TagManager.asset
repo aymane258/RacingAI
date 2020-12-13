@@ -11,6 +11,8 @@ TagManager:
   - Point
   - Destroyer
   - Traveller
+  - Checkpoint
+  - Car
   layers:
   - Default
   - TransparentFX
