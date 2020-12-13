@@ -1,8 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Unity.MLAgents;
 
-public class Car : MonoBehaviour
+public class Car : Agent
 {
     // Start is called before the first frame update
     void Start()
