@@ -5,17 +5,31 @@ using Unity.MLAgents;
 
 public class Car : Agent
 {
-    // Start is called before the first frame update
-    void Start()
-    {
+    public float force = 15f;
+    private Rigidbody rigidbody = null;
 
+    public override void Initialize()
+    {
+        rigidbody = this.GetComponent<Rigidbody>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public override void OnActionReceived(float[] vectorAction)
     {
+        if (vectorAction[0] == 1)
+        {
+            Thrust();
 
+        }
+    }
 
+    public override void Heuristic(float[] actionsOut)
+    {
+        actionsOut[0] = 0;
+        if (Input.GetKey(KeyCode.UpArrow) == true)
+        {
+            actionsOut[0] = 1;
+            AddReward(-0.001f);
+        }
     }
 
     private void OnCollisionEnter(Collision collision)
@@ -29,4 +43,11 @@ public class Car : Agent
             AddReward(-0.1f);
         }
     }
+
+    private void Thrust()
+    {
+        rigidbody.AddForce(Vector3.up * force, ForceMode.Acceleration);
+    }
+
+
 }
