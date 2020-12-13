@@ -109,8 +109,8 @@ GameObject:
   - component: {fileID: 3039100140841632413}
   - component: {fileID: 993600276904834647}
   m_Layer: 0
-  m_Name: kart_model_outline
-  m_TagString: Untagged
+  m_Name: Car
+  m_TagString: Car
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
