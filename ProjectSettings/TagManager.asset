@@ -11,6 +11,7 @@ TagManager:
   - Point
   - Destroyer
   - Traveller
+  - Wall
   layers:
   - Default
   - TransparentFX
