@@ -4,14 +4,9 @@
 TagManager:
   serializedVersion: 2
   tags:
-  - Destination
-  - Menhir
-  - MenhirInPlace
-  - Street
-  - Point
-  - Destroyer
-  - Traveller
+  - Goal
   - Wall
+  - Checkpoint
   layers:
   - Default
   - TransparentFX
@@ -21,10 +16,10 @@ TagManager:
   - UI
   - 
   - 
-  - 
-  - 
-  - 
-  - 
+  - Kart
+  - Post
+  - Road
+  - Checkpoint
   - 
   - 
   - 
