@@ -5,7 +5,7 @@ using Unity.MLAgents.Actuators;
 using Unity.MLAgents.Sensors;
 using UnityEngine;
 
-public class KartAgent : Agent
+public class Kart : Agent
 {
 
    private KartController _kartController;
@@ -20,7 +20,7 @@ public class KartAgent : Agent
    public override void OnEpisodeBegin()
    {
 
-      _kartController.Respawn();
+
    }
 
       public override void OnActionReceived(ActionBuffers actions)
