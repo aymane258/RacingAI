@@ -50,12 +50,12 @@ public class SteeringControl : MonoBehaviour
         HandsRelease();
         HandrotationToSteerrotation();
         TurnKart();
-        currentWheelRotation = -transform.rotation.eulerAngles.z;
+        currentWheelRotation = -transform.rotation.eulerAngles.y;
     }
 
     private void TurnKart()
     {
-        var turn = -transform.rotation.eulerAngles.z;
+        var turn = -transform.rotation.eulerAngles.y;
         if(turn < -350)
         {
             turn += 360; 
@@ -71,6 +71,7 @@ public class SteeringControl : MonoBehaviour
             rHand.transform.parent = rHandParent;
             rHand.transform.position = rHandParent.position;
             rHand.transform.rotation = rHandParent.rotation;
+            rHand.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             rHandOnWheel = false;
         }
         if (lHandOnWheel && leftController.TryGetFeatureValue(CommonUsages.grip, out float ltriggerValue) && ltriggerValue <= 0)
@@ -78,12 +79,13 @@ public class SteeringControl : MonoBehaviour
             lHand.transform.parent = lHandParent;
             lHand.transform.position = lHandParent.position;
             lHand.transform.rotation = lHandParent.rotation;
+            lHand.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
             lHandOnWheel = false;
         }
-        if (!(lHandOnWheel && rHandOnWheel))
+        /*if (!(lHandOnWheel && rHandOnWheel))
         {
             transform.parent = null;
-        }
+        }*/
     }
 
     private void HandrotationToSteerrotation()
@@ -144,6 +146,7 @@ public class SteeringControl : MonoBehaviour
 
         hand.transform.parent = closestPoint.transform;
         hand.transform.position = closestPoint.transform.position;
+        hand.transform.localScale = new Vector3(0.24f, 0.24f, 4.2f);
 
         handOnWheel = true;
         
