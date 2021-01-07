@@ -21,12 +21,13 @@ public class SteeringControl : MonoBehaviour
     public Transform[] snappoints;
 
     public GameObject kart;
-    private Rigidbody kartRB;
+    private KartController _kartController;
+    private float newRot;
 
-    public float currentWheelRotation = 0;
-
-    private float turnDampening = 8000;
-    public Transform directionalObject;
+    private void Awake()
+    {
+        _kartController = kart.GetComponent<KartController>();
+    }
 
     void Start()
     {
@@ -42,71 +43,75 @@ public class SteeringControl : MonoBehaviour
         InputDevices.GetDevicesWithCharacteristics(leftCh, inputDevices);
         leftController = inputDevices[0];
 
-        kartRB = kart.GetComponent<Rigidbody>();
+        _kartController = kart.GetComponent<KartController>();
     }
 
     void Update()
     {
         HandsRelease();
         HandrotationToSteerrotation();
-        TurnKart();
-        currentWheelRotation = -transform.rotation.eulerAngles.y;
     }
 
-    private void TurnKart()
+    private void HandrotationToSteerrotation()
     {
-        var turn = -transform.rotation.eulerAngles.y;
-        if(turn < -350)
+        if (!rHandOnWheel && !lHandOnWheel)
         {
-            turn += 360; 
+            
         }
+        else if (rHandOnWheel)
+        {
+            //newRot = rHand.transform.rotation.eulerAngles.z;
+            //newRot = Vector3.Dot(rHand.transform.parent.position, rHandParent.position);
+            //rHandParent.GetChild(0).gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.blue, (newRot/2)+1 );
 
-        kartRB.MoveRotation(Quaternion.RotateTowards(kart.transform.rotation, Quaternion.Euler(0, turn, 0), Time.deltaTime * turnDampening));
+            Vector3 targetDir = rHand.transform.position - transform.position;
+            newRot = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+        }
+        else if (lHandOnWheel)
+        {
+            //newRot = lHand.transform.rotation.eulerAngles.z;
+            //newRot = Vector3.Dot(lHand.transform.parent.position, lHandParent.position);
+            //lHandParent.GetChild(0).gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.blue, (newRot / 2) + 1);
+
+            Vector3 targetDir = lHand.transform.position - transform.position;
+            newRot = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+
+            //newRot = (Vector3.Angle(rHandParent.GetChild(0).transform.position, lHand.transform.position) - 180) / 180;
+        }
+        _kartController.Steer(newRot);
     }
 
     private void HandsRelease()
     {
         if (rHandOnWheel && rightController.TryGetFeatureValue(CommonUsages.grip, out float rtriggerValue) && rtriggerValue <= 0)
         {
-            rHand.transform.parent = rHandParent;
-            rHand.transform.position = rHandParent.position;
-            rHand.transform.rotation = rHandParent.rotation;
-            rHand.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            //rHand.transform.parent = rHandParent;
+            //rHand.transform.position = rHandParent.position;
+            //rHand.transform.rotation = rHandParent.rotation;
+            rHand.SetActive(true);
+            if(rHandParent.childCount > 0)
+            {
+                for (int i = 0; i < rHandParent.childCount; i++)
+                {
+                    rHandParent.GetChild(i).gameObject.SetActive(false);
+                }
+            }
             rHandOnWheel = false;
         }
         if (lHandOnWheel && leftController.TryGetFeatureValue(CommonUsages.grip, out float ltriggerValue) && ltriggerValue <= 0)
         {
-            lHand.transform.parent = lHandParent;
-            lHand.transform.position = lHandParent.position;
-            lHand.transform.rotation = lHandParent.rotation;
-            lHand.transform.localScale = new Vector3(0.1f, 0.1f, 0.1f);
+            //lHand.transform.parent = lHandParent;
+            //lHand.transform.position = lHandParent.position;
+            //lHand.transform.rotation = lHandParent.rotation;
+            lHand.SetActive(true);
+            if (lHandParent.childCount > 0)
+            {
+                for (int i = 0; i < lHandParent.childCount; i++)
+                {
+                    lHandParent.GetChild(i).gameObject.SetActive(false);
+                }
+            }
             lHandOnWheel = false;
-        }
-        /*if (!(lHandOnWheel && rHandOnWheel))
-        {
-            transform.parent = null;
-        }*/
-    }
-
-    private void HandrotationToSteerrotation()
-    {
-        if (rHandOnWheel && !lHandOnWheel)
-        {
-            Quaternion newRot = Quaternion.Euler(0, 0, rHandParent.transform.rotation.eulerAngles.z);
-            directionalObject.rotation = newRot;
-            transform.parent = directionalObject;
-        } else if (!rHandOnWheel && lHandOnWheel)
-        {
-            Quaternion newRot = Quaternion.Euler(0, 0, lHandParent.transform.rotation.eulerAngles.z);
-            directionalObject.rotation = newRot;
-            transform.parent = directionalObject;
-        } else if (rHandOnWheel && lHandOnWheel)
-        {
-            Quaternion newRotR = Quaternion.Euler(0, 0, rHandParent.transform.rotation.eulerAngles.z);
-            Quaternion newRotL = Quaternion.Euler(0, 0, lHandParent.transform.rotation.eulerAngles.z);
-            Quaternion finalRot = Quaternion.Slerp(newRotL, newRotR, 1.0f / 2.0f);
-            directionalObject.rotation = finalRot;
-            transform.parent = directionalObject;
         }
     }
 
@@ -132,21 +137,25 @@ public class SteeringControl : MonoBehaviour
 
         foreach (var point in snappoints)
         {
-            if(point.childCount == 0)
-            {
                 var distance = Vector3.Distance(point.position, hand.transform.position);
                 if (distance < shortestdistance)
                 {
                     shortestdistance = distance;
                     closestPoint = point;
                 }
+        }
+        if(closestPoint.childCount > 0)
+        {
+            for (int i = 0; i < closestPoint.childCount; i++)
+            {
+                closestPoint.GetChild(i).gameObject.SetActive(true);
             }
         }
-        handParent = hand.transform.parent;
+        hand.gameObject.SetActive(false);
+        handParent = closestPoint;
 
-        hand.transform.parent = closestPoint.transform;
-        hand.transform.position = closestPoint.transform.position;
-        hand.transform.localScale = new Vector3(0.24f, 0.24f, 4.2f);
+        //hand.transform.parent = closestPoint.transform;
+        //hand.transform.position = closestPoint.transform.position;
 
         handOnWheel = true;
         

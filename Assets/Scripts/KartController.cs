@@ -60,7 +60,7 @@ public class KartController : MonoBehaviour
    
    public void FixedUpdate()
    {
-      sphere.AddForce(-kartModel.transform.right * currentSpeed, ForceMode.Acceleration);
+      sphere.AddForce(-kartModel.transform.forward * currentSpeed, ForceMode.Acceleration);
 
       //Gravity
       sphere.AddForce(Vector3.down * gravity, ForceMode.Acceleration);
@@ -81,10 +81,10 @@ public class KartController : MonoBehaviour
    
    public void Steer(float steeringSignal)
    {
-      int steerDirection = steeringSignal > 0 ? 1 : -1;
-      float steeringStrength = Mathf.Abs(steeringSignal);
-      
-      rotate = (steering * steerDirection) * steeringStrength;
+        int steerDirection = steeringSignal > 0 ? 1 : -1;
+        float steeringStrength = Mathf.Abs(steeringSignal);
+
+        rotate = (steering * steerDirection) * steeringStrength;
    }
 
 }

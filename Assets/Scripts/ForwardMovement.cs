@@ -28,6 +28,7 @@ public class ForwardMovement : MonoBehaviour
         if (inputSource.TryGetFeatureValue(CommonUsages.primaryButton, out bool buttonPressed) && buttonPressed)
         {
             _kartController.ApplyAcceleration(1f);
+
         }
     }
 }
