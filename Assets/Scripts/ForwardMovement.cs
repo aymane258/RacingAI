@@ -7,13 +7,13 @@ using UnityEngine.XR;
 public class ForwardMovement : MonoBehaviour
 {
     private InputDevice inputSource;
-    private KartController _kartController;
+    private newMovement _movement;
     private List<InputDevice> devices = new List<InputDevice>();
     Rigidbody rbKart;
 
     void Start()
     {
-        _kartController = GetComponent<KartController>();
+        _movement = GetComponent<newMovement>();
 
         InputDevices.GetDevices(devices);
         InputDeviceCharacteristics rightCh = InputDeviceCharacteristics.Right;
@@ -27,8 +27,7 @@ public class ForwardMovement : MonoBehaviour
     {
         if (inputSource.TryGetFeatureValue(CommonUsages.primaryButton, out bool buttonPressed) && buttonPressed)
         {
-            _kartController.ApplyAcceleration(1f);
-
+            _movement.ApplyAcceleration(1f);
         }
     }
 }

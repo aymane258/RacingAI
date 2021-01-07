@@ -2,11 +2,16 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Xml;
+using TMPro;
 using UnityEngine;
 using UnityEngine.XR;
 
+[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(BoxCollider))]
 public class SteeringControl : MonoBehaviour
 {
+    public TextMeshPro text;
+
     InputDevice leftController;
     InputDevice rightController;
 
@@ -21,12 +26,12 @@ public class SteeringControl : MonoBehaviour
     public Transform[] snappoints;
 
     public GameObject kart;
-    private KartController _kartController;
-    private float newRot;
+    private newMovement _movement;
+    private float rotation;
 
     private void Awake()
     {
-        _kartController = kart.GetComponent<KartController>();
+        _movement = kart.GetComponent<newMovement>();
     }
 
     void Start()
@@ -42,11 +47,9 @@ public class SteeringControl : MonoBehaviour
         InputDeviceCharacteristics leftCh = InputDeviceCharacteristics.Left;
         InputDevices.GetDevicesWithCharacteristics(leftCh, inputDevices);
         leftController = inputDevices[0];
-
-        _kartController = kart.GetComponent<KartController>();
     }
 
-    void Update()
+    void FixedUpdate()
     {
         HandsRelease();
         HandrotationToSteerrotation();
@@ -54,40 +57,40 @@ public class SteeringControl : MonoBehaviour
 
     private void HandrotationToSteerrotation()
     {
-        if (!rHandOnWheel && !lHandOnWheel)
-        {
-            
-        }
-        else if (rHandOnWheel)
-        {
-            //newRot = rHand.transform.rotation.eulerAngles.z;
-            //newRot = Vector3.Dot(rHand.transform.parent.position, rHandParent.position);
-            //rHandParent.GetChild(0).gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.blue, (newRot/2)+1 );
+        float currentRotation = rotation;
 
+        if (rHandOnWheel)
+        {
+            // Calcute angle
             Vector3 targetDir = rHand.transform.position - transform.position;
-            newRot = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+            float a = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+            currentRotation += a;
         }
         else if (lHandOnWheel)
         {
-            //newRot = lHand.transform.rotation.eulerAngles.z;
-            //newRot = Vector3.Dot(lHand.transform.parent.position, lHandParent.position);
-            //lHandParent.GetChild(0).gameObject.GetComponent<Renderer>().material.color = Color.Lerp(Color.red, Color.blue, (newRot / 2) + 1);
-
+            // Calcute angle
             Vector3 targetDir = lHand.transform.position - transform.position;
-            newRot = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
-
-            //newRot = (Vector3.Angle(rHandParent.GetChild(0).transform.position, lHand.transform.position) - 180) / 180;
+            float a = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+            currentRotation += a;
+        }else
+        {
+            currentRotation = 0;
         }
-        _kartController.Steer(newRot);
+
+        text.text = $"Cur: {(currentRotation * 100)}";
+
+        currentRotation = Mathf.Clamp(currentRotation, -1f, 1f);
+
+        _movement.Steer(currentRotation);
+        rotation = currentRotation;
+
+        transform.rotation = Quaternion.Euler(0, 0, 180 * currentRotation);
     }
 
     private void HandsRelease()
     {
         if (rHandOnWheel && rightController.TryGetFeatureValue(CommonUsages.grip, out float rtriggerValue) && rtriggerValue <= 0)
         {
-            //rHand.transform.parent = rHandParent;
-            //rHand.transform.position = rHandParent.position;
-            //rHand.transform.rotation = rHandParent.rotation;
             rHand.SetActive(true);
             if(rHandParent.childCount > 0)
             {
@@ -100,9 +103,6 @@ public class SteeringControl : MonoBehaviour
         }
         if (lHandOnWheel && leftController.TryGetFeatureValue(CommonUsages.grip, out float ltriggerValue) && ltriggerValue <= 0)
         {
-            //lHand.transform.parent = lHandParent;
-            //lHand.transform.position = lHandParent.position;
-            //lHand.transform.rotation = lHandParent.rotation;
             lHand.SetActive(true);
             if (lHandParent.childCount > 0)
             {
@@ -153,11 +153,6 @@ public class SteeringControl : MonoBehaviour
         }
         hand.gameObject.SetActive(false);
         handParent = closestPoint;
-
-        //hand.transform.parent = closestPoint.transform;
-        //hand.transform.position = closestPoint.transform.position;
-
         handOnWheel = true;
-        
     }
 }
