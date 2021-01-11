@@ -23,6 +23,7 @@ public class SteeringControl : MonoBehaviour
     private Transform lHandParent;
     private bool lHandOnWheel = false;
 
+    public GameObject steer;
     public Transform[] snappoints;
 
     public GameObject kart;
@@ -51,6 +52,11 @@ public class SteeringControl : MonoBehaviour
 
     void FixedUpdate()
     {
+        steer.transform.localPosition = Vector3.zero;
+        float rot = -rotation * 180;
+        steer.transform.localRotation = Quaternion.Euler(0,0,(rot + 360f) % 360);
+        transform.localRotation = Quaternion.identity;
+        transform.localPosition = new Vector3(0, 0.5915f, 0.3159f);
         HandsRelease();
         HandrotationToSteerrotation();
     }
@@ -63,28 +69,27 @@ public class SteeringControl : MonoBehaviour
         {
             // Calcute angle
             Vector3 targetDir = rHand.transform.position - transform.position;
-            float a = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+            float a = ((Vector3.Angle(transform.up, targetDir) - 90) / 180) / 3;
             currentRotation += a;
         }
         else if (lHandOnWheel)
         {
             // Calcute angle
-            Vector3 targetDir = lHand.transform.position - transform.position;
-            float a = (Vector3.Angle(transform.forward, targetDir) - 180) / 180;
+            Vector3 targetDir = rHand.transform.position - transform.position;
+            float a = -((Vector3.Angle(transform.up, targetDir) - 90) / 180) / 3;
             currentRotation += a;
-        }else
+        }
+        else
         {
             currentRotation = 0;
         }
 
-        text.text = $"Cur: {(currentRotation * 100)}";
+        text.text = $"Cur: {(currentRotation * 180)}";
 
         currentRotation = Mathf.Clamp(currentRotation, -1f, 1f);
 
         _movement.Steer(currentRotation);
         rotation = currentRotation;
-
-        transform.rotation = Quaternion.Euler(0, 0, 180 * currentRotation);
     }
 
     private void HandsRelease()

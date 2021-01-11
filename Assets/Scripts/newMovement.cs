@@ -18,6 +18,7 @@ public class newMovement : MonoBehaviour
     [Range(-1f,1f)]
     private float currentSpeed;
     public LayerMask layerMask;
+    public float raydistance = 1f;
 
     void Start()
     {
@@ -32,9 +33,9 @@ public class newMovement : MonoBehaviour
 
         if (isRiding)
         {
-            if(Physics.Raycast(transform.position, Vector3.down, .1f, layerMask))
+            if(Physics.Raycast(transform.position, Vector3.down, raydistance, layerMask))
             {
-                Debug.DrawRay(transform.position, Vector3.down * .1f, Color.green, 1f);
+                Debug.DrawRay(transform.position, Vector3.down * .1f, Color.green, raydistance);
                 transform.Rotate(0, (rotation * currentSpeed) * rotationSpeed * Time.fixedDeltaTime, 0);
                 Vector3 localVelocity = transform.rotation * (Vector3.forward * wheelSpeed);
                 body.velocity = localVelocity;

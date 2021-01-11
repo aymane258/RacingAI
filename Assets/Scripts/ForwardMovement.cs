@@ -29,5 +29,9 @@ public class ForwardMovement : MonoBehaviour
         {
             _movement.ApplyAcceleration(1f);
         }
+        if (inputSource.TryGetFeatureValue(CommonUsages.secondaryButton, out bool buttonPressed2) && buttonPressed2)
+        {
+            _movement.ApplyAcceleration(-1f);
+        }
     }
 }
